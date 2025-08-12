@@ -1,9 +1,3 @@
-/**
- * server.js - Express server that scrapes TFT data and serves HTML
- * Run: npm install express cheerio
- * Then: node server.js
- */
-
 const express = require('express');
 const cheerio = require('cheerio');
 const path = require('path');
@@ -14,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 // Serve static files
 app.use(express.static('public'));
 
-// Rank hierarchy for proper sorting
+// Rank hierarchy for proper sorting (includes divisions)
 function getRankValue(rank) {
   const rankHierarchy = {
     'Iron': 1,
@@ -29,9 +23,28 @@ function getRankValue(rank) {
     'Challenger': 10
   };
   
-  // Extract the rank name (remove any additional text like divisions)
-  const rankName = rank.split(' ')[0];
-  return rankHierarchy[rankName] || 0;
+  const divisionValues = {
+    'IV': 0.25,
+    'III': 0.5,
+    'II': 0.75,
+    'I': 1.0
+  };
+  
+  // Parse rank and division
+  const rankParts = rank.split(' ');
+  const rankName = rankParts[0];
+  const division = rankParts[1];
+  
+  const baseRankValue = rankHierarchy[rankName] || 0;
+  
+  // For Master and above, no divisions
+  if (baseRankValue >= 8) {
+    return baseRankValue;
+  }
+  
+  // For ranks below Master, add division value
+  const divisionValue = divisionValues[division] || 0;
+  return baseRankValue + divisionValue;
 }
 
 // Scraping function
@@ -50,11 +63,30 @@ async function scrapeTFTData(username, region = 'na') {
     const avatarImg = $('.avatar img');
     const avatarSrc = avatarImg.attr('src') || '';
     
-    // Extract rank and LP
+    // Extract rank image
+    const rankImg = $('.rank img');
+    const rankImageSrc = rankImg.attr('src') || '';
+    
+    // Extract rank and LP - Updated to capture divisions
     const tierText = $('.tier').text();
-    const rankMatch = tierText.match(/^([A-Za-z]+)/);
+    
+    // Look for rank with division (e.g., "Diamond II", "Gold III")
+    const rankWithDivisionMatch = tierText.match(/^([A-Za-z]+)\s+(I{1,3}V?|IV)/);
+    // Look for rank without division (Master, Grandmaster, Challenger)
+    const rankWithoutDivisionMatch = tierText.match(/^(Master|Grandmaster|Challenger)/);
+    
+    let rank = '';
+    if (rankWithDivisionMatch) {
+      rank = `${rankWithDivisionMatch[1]} ${rankWithDivisionMatch[2]}`;
+    } else if (rankWithoutDivisionMatch) {
+      rank = rankWithoutDivisionMatch[1];
+    } else {
+      // Fallback to original logic
+      const rankMatch = tierText.match(/^([A-Za-z]+)/);
+      rank = rankMatch ? rankMatch[1] : '';
+    }
+    
     const lpMatch = tierText.match(/(\d+)\s*LP/);
-    const rank = rankMatch ? rankMatch[1] : '';
     const LP = lpMatch ? parseInt(lpMatch[1]) : 0;
     
     // Extract stats from labels
@@ -82,6 +114,7 @@ async function scrapeTFTData(username, region = 'na') {
       user,
       region: region.toUpperCase(),
       avatar: avatarSrc,
+      rankImage: rankImageSrc,
       rank,
       LP,
       wins,
