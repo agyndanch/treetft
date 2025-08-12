@@ -15,6 +15,6 @@
     "node": ">=18.0.0"
   },
   "keywords": ["tft", "leaderboard", "scraping"],
-  "author": "Your Name",
+  "author": "Andy Chang",
   "license": "MIT"
 }

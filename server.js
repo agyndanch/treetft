@@ -14,6 +14,26 @@ const PORT = process.env.PORT || 3000;
 // Serve static files
 app.use(express.static('public'));
 
+// Rank hierarchy for proper sorting
+function getRankValue(rank) {
+  const rankHierarchy = {
+    'Iron': 1,
+    'Bronze': 2,
+    'Silver': 3,
+    'Gold': 4,
+    'Platinum': 5,
+    'Diamond': 6,
+    'Emerald': 7,
+    'Master': 8,
+    'Grandmaster': 9,
+    'Challenger': 10
+  };
+  
+  // Extract the rank name (remove any additional text like divisions)
+  const rankName = rank.split(' ')[0];
+  return rankHierarchy[rankName] || 0;
+}
+
 // Scraping function
 async function scrapeTFTData(username, region = 'na') {
   try {
@@ -69,7 +89,8 @@ async function scrapeTFTData(username, region = 'na') {
       top4Count,
       top4Rate,
       games,
-      avgRank
+      avgRank,
+      profileUrl: url // Add the profile URL for linking
     };
   } catch (error) {
     console.error('Error scraping data:', error);
@@ -99,8 +120,15 @@ app.get('/api/leaderboard', async (req, res) => {
   }
   
   if (leaderboardData.length > 0) {
-    // Sort by LP (descending) for proper leaderboard ranking
-    leaderboardData.sort((a, b) => b.LP - a.LP);
+    // Sort by rank first (descending), then by LP (descending) for proper leaderboard ranking
+    leaderboardData.sort((a, b) => {
+      const rankDiff = getRankValue(b.rank) - getRankValue(a.rank);
+      if (rankDiff !== 0) {
+        return rankDiff; // Sort by rank first
+      }
+      return b.LP - a.LP; // If same rank, sort by LP
+    });
+    
     res.json(leaderboardData);
   } else {
     res.status(500).json({ error: 'Failed to fetch any player data' });

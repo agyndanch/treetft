@@ -64,11 +64,14 @@
             border-bottom: 1px solid #f0f0f0;
             transition: all 0.3s ease;
             cursor: pointer;
+            text-decoration: none;
+            color: inherit;
         }
 
         .player-item:hover {
             background: #f8f9ff;
             transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
         }
 
         .player-rank {
@@ -165,6 +168,19 @@
             font-size: 1.1rem;
         }
 
+        .click-hint {
+            font-size: 0.8rem;
+            color: #999;
+            text-align: center;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .player-item:hover .click-hint {
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
             .player-item {
                 grid-template-columns: 1fr;
@@ -188,6 +204,7 @@
         <div class="leaderboard">
             <div class="leaderboard-header">
                 Tree TFT Leaderboard
+                <div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.9;">Click on a player to view their profile</div>
             </div>
             <div id="playerList">
                 <div class="loading">Loading leaderboard...</div>
@@ -222,6 +239,11 @@
             
             const playerItem = document.createElement('div');
             playerItem.className = 'player-item';
+            
+            // Add click event to open profile in new tab
+            playerItem.addEventListener('click', () => {
+                window.open(playerData.profileUrl, '_blank');
+            });
             
             const tierClass = playerData.rank.toLowerCase().replace(/\s+/g, '');
             
@@ -268,6 +290,7 @@
                             <div class="stat-label">Avg Place</div>
                         </div>
                     </div>
+                    <div class="click-hint">Click to view profile →</div>
                 </div>
             `;
             
