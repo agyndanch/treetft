@@ -16,8 +16,8 @@ function getRankValue(rank) {
     'Silver': 3,
     'Gold': 4,
     'Platinum': 5,
-    'Diamond': 6,
-    'Emerald': 7,
+    'Emerald': 6,
+    'Diamond': 7,
     'Master': 8,
     'Grandmaster': 9,
     'Challenger': 10
@@ -131,7 +131,7 @@ async function scrapeTFTData(username, region = 'na') {
   }
 }
 
-// API endpoint to get leaderboard data
+// API endpoint to get leaderboard data (original)
 app.get('/api/leaderboard', async (req, res) => {
   console.log('Fetching leaderboard data...');
   
@@ -168,11 +168,59 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
-// Serve the HTML page
+// API endpoint to get leaderboard2 data (new)
+app.get('/api/leaderboard2', async (req, res) => {
+  console.log('Fetching leaderboard 2 data...');
+  
+  const players = [
+    { username: 'noa6-6367', region: 'na' },
+    { username: 'naruto-g3r', region: 'na' },
+    { username: 'uoo-3009', region: 'na' },
+    { username: 'noafknhandsome-kim', region: 'na' },
+    { username: 'testosteronepump-999', region: 'na' },
+    { username: 'albertkanggg-NA1', region: 'na' },
+    { username: 'sieun-ieu', region: 'na' },
+    { username: '993-tty', region: 'na' }
+  ];
+  
+  const leaderboardData = [];
+  
+  for (const player of players) {
+    console.log(`Scraping data for ${player.username}...`);
+    const data = await scrapeTFTData(player.username, player.region);
+    if (data) {
+      leaderboardData.push(data);
+    }
+  }
+  
+  if (leaderboardData.length > 0) {
+    // Sort by rank first (descending), then by LP (descending) for proper leaderboard ranking
+    leaderboardData.sort((a, b) => {
+      const rankDiff = getRankValue(b.rank) - getRankValue(a.rank);
+      if (rankDiff !== 0) {
+        return rankDiff; // Sort by rank first
+      }
+      return b.LP - a.LP; // If same rank, sort by LP
+    });
+    
+    res.json(leaderboardData);
+  } else {
+    res.status(500).json({ error: 'Failed to fetch any player data' });
+  }
+});
+
+// Serve the HTML page (original)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Serve the second leaderboard HTML page
+app.get('/leaderboard2', (req, res) => {
+  res.sendFile(path.join(__dirname, 'leaderboard2.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+  console.log('Leaderboard 1 will show data for: bird-biird, Monoceros-atlas, babyyccee-ttv, ashwu-0321');
+  console.log('Leaderboard 2 will show data for: noa6#6367, naruto#g3r, uoo#3009, noafknhandsome#kim, testosteronepump#999, albertkanggg#NA1, sieun#ieu, 993#tty');
 });

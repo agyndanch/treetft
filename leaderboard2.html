@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree TFT Leaderboard</title>
+    <title>Tree TFT Leaderboard 2</title>
     <style>
         * {
             margin: 0;
@@ -236,6 +236,15 @@
                 height: 50px;
             }
 
+            .navigation {
+                margin: 10px 0;
+            }
+
+            .nav-link {
+                display: block;
+                margin: 5px 0;
+            }
+
             .player-item {
                 grid-template-columns: 1fr;
                 gap: 15px;
@@ -257,15 +266,14 @@
 <body>
     <div class="container">
         <h1>
-            <img src="images/bird.jpg" alt="Bird Icon" class="header-bird-icon" onclick="window.location.href='/leaderboard2'">
+            <img src="images/bird.jpg" alt="Bird Icon" class="header-bird-icon" onclick="window.location.href='/'">
             bird's TFT Leaderboard
         </h1>
         
         <div class="leaderboard">
             <div class="leaderboard-header">
-                <img src="images/birdnest.png" alt="Tree Server Icon" class="header-icon">
                 <div>
-                    Tree TFT Leaderboard
+                    leaderboard of those people
                 </div>
             </div>
             <div id="playerList">
@@ -279,7 +287,7 @@
             const playerList = document.getElementById('playerList');
             
             try {
-                const response = await fetch('/api/leaderboard');
+                const response = await fetch('/api/leaderboard2');
                 const players = await response.json();
 
                 if (response.ok && players.length > 0) {
