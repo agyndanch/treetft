@@ -202,7 +202,7 @@ app.get('/api/leaderboard2', async (req, res) => {
   
   const players = [
     { username: 'noa6-6367', region: 'na' },
-    { username: 'naruto-g3r', region: 'na' },
+    { username: 'nicc-1004', region: 'na' },
     { username: 'uoo-3009', region: 'na' },
     { username: 'noafknhandsome-kim', region: 'na' },
     { username: 'testosteronepump-999', region: 'na' },
@@ -252,5 +252,5 @@ app.get('/leaderboard2', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log('Leaderboard 1 will show data for: bird-biird, Monoceros-atlas, babyyccee-ttv, ashwu-0321');
-  console.log('Leaderboard 2 will show data for: noa6#6367, naruto#g3r, uoo#3009, noafknhandsome#kim, testosteronepump#999, albertkanggg#NA1, sieun#ieu, 993#tty, ziroh#4444');
+  console.log('Leaderboard 2 will show data for: noa6#6367, nicc#1004, uoo#3009, noafknhandsome#kim, testosteronepump#999, albertkanggg#NA1, sieun#ieu, 993#tty, ziroh#4444');
 });
