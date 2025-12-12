@@ -50,7 +50,7 @@ function getRankValue(rank) {
 // Scraping function
 async function scrapeTFTData(username, region = 'na') {
   try {
-    const url = `https://lolchess.gg/profile/${region}/${username}/set15`;
+    const url = `https://lolchess.gg/profile/${region}/${username}/set16`;
     console.log(`Scraping URL: ${url}`);
     
     const response = await fetch(url);
